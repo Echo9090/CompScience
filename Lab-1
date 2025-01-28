@@ -1,0 +1,58 @@
+# File: comp_science_lab1/linear_regression.py
+
+import matplotlib.pyplot as plt
+
+def manual_linear_regression(x, y):
+    """
+    Compute the slope (m) and intercept (b) for the linear regression line.
+    x: list of independent variable values
+    y: list of dependent variable values
+    Returns: slope (m), intercept (b)
+    """
+    n = len(x)
+    sum_x = sum(x)
+    sum_y = sum(y)
+    sum_xy = sum(xi * yi for xi, yi in zip(x, y))
+    sum_x2 = sum(xi**2 for xi in x)
+
+    # Calculate slope (m) and intercept (b)
+    m = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x**2)
+    b = (sum_y - m * sum_x) / n
+    return m, b
+
+def plot_regression_line(x, y, m, b):
+    """
+    Plot the data points and regression line.
+    x: list of independent variable values
+    y: list of dependent variable values
+    m: slope of the regression line
+    b: intercept of the regression line
+    """
+    # Scatter plot of the data
+    plt.scatter(x, y, color='blue', label='Data points')
+
+    # Regression line
+    y_pred = [m * xi + b for xi in x]
+    plt.plot(x, y_pred, color='red', label='Regression line')
+
+    # Add labels and legend
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Manual Linear Regression')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+# Example dataset
+x_values = [1, 2, 3, 4, 5]
+y_values = [2.2, 2.8, 4.5, 3.7, 5.5]
+
+# Perform linear regression
+slope, intercept = manual_linear_regression(x_values, y_values)
+
+# Print the slope and intercept
+print(f"Slope (m): {slope}")
+print(f"Intercept (b): {intercept}")
+
+# Plot the regression line
+plot_regression_line(x_values, y_values, slope, intercept)
