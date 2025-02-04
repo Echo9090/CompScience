@@ -1,0 +1,85 @@
+class GaussianNaiveBayes:
+    def __init__(self):
+        self.class_summaries = {}  # Stores mean, variance for each class and feature
+        self.class_counts = {}  # Number of samples per class
+        self.total_samples = 0  # Total samples in dataset
+
+    def train(self, dataset):
+        for features, label in dataset:
+            if label not in self.class_summaries:
+                self.class_summaries[label] = {}
+                self.class_counts[label] = 0
+
+            self.class_counts[label] += 1
+            self.total_samples += 1
+
+            for i, value in enumerate(features):
+                if i not in self.class_summaries[label]:
+                    self.class_summaries[label][i] = {'sum': 0, 'sum_sq': 0, 'count': 0}
+                
+                self.class_summaries[label][i]['sum'] += value
+                self.class_summaries[label][i]['sum_sq'] += value ** 2
+                self.class_summaries[label][i]['count'] += 1
+
+        # Compute mean and variance for each feature per class
+        for label, features in self.class_summaries.items():
+            for i in features:
+                f = features[i]
+                mean = f['sum'] / f['count']
+                variance = (f['sum_sq'] / f['count']) - (mean ** 2)
+                self.class_summaries[label][i] = {'mean': mean, 'variance': variance}
+
+    def calculate_probability(self, x, mean, variance):
+        if variance == 0:  # Prevent division by zero
+            variance = 1e-6  # Small constant
+
+        exponent = ((x - mean) ** 2) / (2 * variance)
+        return (1 / ((2 * 3.1416 * variance) ** 0.5)) * (2.7183 ** -exponent)
+
+    def calculate_class_probability(self, features, label):
+        class_prob = self.class_counts[label] / self.total_samples
+        prob = class_prob
+
+        for i, value in enumerate(features):
+            if i in self.class_summaries[label]:  # Ensure feature exists
+                mean = self.class_summaries[label][i]['mean']
+                variance = self.class_summaries[label][i]['variance']
+                prob *= self.calculate_probability(value, mean, variance)
+
+        return prob
+
+    def predict(self, features):
+        best_class = None
+        best_prob = -1
+
+        for label in self.class_summaries:
+            class_prob = self.calculate_class_probability(features, label)
+            if class_prob > best_prob:
+                best_class = label
+                best_prob = class_prob
+
+        return best_class
+
+
+# Training dataset (Features: Height, Weight, Age)
+dataset = [
+    ([180, 80, 25], "male"),
+    ([175, 78, 28], "male"),
+    ([170, 75, 30], "male"),
+    ([160, 55, 23], "female"),
+    ([165, 50, 20], "female"),
+    ([155, 45, 22], "female"),
+]
+
+nb = GaussianNaiveBayes()
+nb.train(dataset)
+
+# Test cases
+test_case_1 = [172, 70, 26]  
+test_case_2 = [158, 48, 21]  
+test_case_3 = [168, 60, 24]  
+
+# Predictions
+print(f"Prediction for {test_case_1}: {nb.predict(test_case_1)}")  
+print(f"Prediction for {test_case_2}: {nb.predict(test_case_2)}")  
+print(f"Prediction for {test_case_3}: {nb.predict(test_case_3)}") 
