@@ -1,0 +1,57 @@
+# Function to calculate Euclidean distance between two points
+def euclidean_distance(a, b):
+    total = 0
+    for i in range(len(a)):
+        total += (a[i] - b[i]) ** 2
+    return total ** 0.5
+
+# KNN function to classify a new point
+def knn_classifier(training_data, training_labels, test_point, k):
+    neighbors = []
+    
+    # Calculate distance from test_point to all training points
+    for i in range(len(training_data)):
+        dist = euclidean_distance(test_point, training_data[i])
+        neighbors.append((dist, training_labels[i]))
+    
+    # Sort by distance
+    neighbors.sort()
+    
+    # Get the labels of k nearest neighbors
+    top_k_labels = [label for _, label in neighbors[:k]]
+    
+    # Find the most common label
+    label_counts = {}
+    for label in top_k_labels:
+        if label in label_counts:
+            label_counts[label] += 1
+        else:
+            label_counts[label] = 1
+    
+    # Return the label with the highest count
+    most_common_label = None
+    max_count = 0
+    for label, count in label_counts.items():
+        if count > max_count:
+            most_common_label = label
+            max_count = count
+    
+    return most_common_label
+
+# Training data and labels
+train_points = [
+    [1, 1], [2, 2], [3, 3], [6, 6], [7, 7],
+    [8, 8], [9, 9], [11, 11], [12, 12], [14, 14]
+]
+train_labels = [
+    'Tea', 'Tea', 'Tea', 'Coffee', 'Coffee',
+    'Coffee', 'Coffee', 'Water', 'Water', 'Water'
+]
+
+# New point to classify
+new_point = [10, 10]
+k_value = 3
+
+# Predicting the label
+result = knn_classifier(train_points, train_labels, new_point, k_value)
+print(f"The predicted category for {new_point} is: {result}")
